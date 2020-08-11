@@ -1,0 +1,59 @@
+---
+title: "12.2 Independent sampling"
+output: html_notebook
+---
+#12.2.1
+```{r}
+fPDF <- function(X){
+  y <- ifelse(X < 0.9735, (1 / 1.33485) * (1 / sqrt(2 * pi)) * exp(-X ^ 2 / 2), ifelse(X <= 5, 0.186056, 0))
+return(y)
+}
+
+integrate(fPDF,0,8)
+
+```
+
+```{r}
+fReject <- function(N){
+  count <- 1
+  lSamples <- vector(length=N)
+  while(count <= N){
+    X <- runif(1, 0, 5)
+    Y <- runif(1, 0, (1 / 1.335) * (1 / sqrt(2 * pi)))
+    if(Y < fPDF(X)){
+      lSamples[count] <- X
+      count <- count + 1
+    }
+}
+  return(lSamples)
+}
+mean(fReject(10000))
+var(fReject(10000))
+```
+```{r}
+fIntegrator <- function(X){
+  return(integrate(fPDF, 0, X)[[1]])
+}
+lCDF <- sapply(seq(0, 5, 0.1), fIntegrator)
+fICDF <- approxfun(lCDF, seq(0, 5, 0.1))
+fInverseTransform <- function(N){
+  lCDF <- runif(N, 0, 1)
+  return(sapply(lCDF, fICDF))
+}
+mean(fInverseTransform(100000))
+var(fInverseTransform(100000))
+```
+
+```{r}
+fImportance <- function(N){
+  lX <- runif(N, 0, 5)
+  lF <- sapply(lX, fPDF)
+  lG <- rep(1 / 5, N)
+  lRatio <- lX * lF / lG
+  mean(lRatio)
+}
+fImportance(10000)
+```
+```{r}
+rep(1 / 5, 20)
+```

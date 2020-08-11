@@ -1,0 +1,21 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+# Figure 12.4
+
+```{r}
+par(mfrow=c(1,3))
+hist(replicate(10000, mean(dpois(lambda = rlnorm(10, meanlog = 1,sdlog = 1), x=7))), main = "N=10", xlim = c(0.0, 0.10))
+hist(replicate(10000, mean(dpois(lambda = rlnorm(100, meanlog = 1,sdlog = 1), x=7))), main = "N=100", xlim = c(0.0, 0.10))
+hist(replicate(10000, mean(dpois(lambda = rlnorm(1000, meanlog = 1,sdlog = 1), x=7))), main = "N=1000", xlim = c(0.0, 0.10))
+
+```
+```{r}
+hist(replicate(10000, mean(dpois(lambda = rlnorm(100, meanlog = 1,sdlog = 1), x=7))))
+
+```
+```{r}
+hist(replicate(10000, mean(dpois(lambda = rlnorm(100, meanlog = 1,sdlog = 1), x=7))))
+```
+

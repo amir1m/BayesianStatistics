@@ -1,0 +1,54 @@
+---
+title: "Table 12.1"
+output: html_notebook
+---
+
+```{r}
+prior <- dlnorm(seq(0,20,by=2))/sum(dlnorm(seq(0,20,by=2)))
+prior
+sum(prior)
+```
+
+```{r}
+#likelihood <- dpois(x=seq(2,20,by=2), lambda=7)
+likelihood <- dpois(x=7, lambda=seq(0,20,by=2))
+likelihood
+sum(likelihood)
+```
+```{r}
+prior * likelihood
+sum(prior * likelihood)
+```
+```{r}
+posterior <- (prior * likelihood)/sum(prior*likelihood)
+sum(posterior)
+```
+
+```{r}
+lambda_times_posterior <- seq(0,20,by=2) * posterior
+lambda_times_posterior
+```
+```{r}
+sum(lambda_times_posterior)
+```
+
+# Figure 12.1
+```{r}
+curve(dlnorm(x), 0,20)
+```
+Prior:
+```{r}
+sum(dlnorm(seq(0,20,by=2)))
+plot(dlnorm(seq(0,20,by=2)))
+```
+
+Likelihood
+```{r}
+plot(dpois(lambda = seq(0,20,by=2), x = 7))
+```
+
+Posterior
+```{r}
+plot(prior*likelihood/sum(prior*likelihood ))
+```
+

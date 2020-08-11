@@ -1,0 +1,57 @@
+---
+title: "Problem 10.2 Sleep-deprived reactions Ben Lambert. A Student’s Guide to Bayesian Statistics"
+
+output: html_notebook
+---
+# 10.2.1
+```{r}
+data <- read.csv("evaluation_sleepstudy.csv")
+head(data)
+```
+```{r}
+plot(data$Days, data$Reaction)
+abline(lm(data$Reaction ~ data$Days))
+```
+```{r}
+library(ggplot2)
+```
+```{r}
+df <- read.csv('evaluation_sleepstudy.csv')
+ggplot(data=df, aes(x=Days, y=Reaction)) + geom_point() +
+  geom_smooth(method='lm')
+```
+
+
+# 10.2.2
+```{r}
+library(lattice)
+xyplot(df$Reaction ~ df$Days | Subject, df, type=c("g", "p", "r"),
+       index=function(x, y) coef(lm(y ~ x))[1],
+       xlab="Days of sleep deprivation",
+       ylab="Average reaction time (ms)",
+       aspect="xy")
+
+```
+
+
+
+# 10.2.3
+```{r}
+mysamples <- read.csv("evaluation_sleepPosteriors.csv")
+head(mysamples)
+```
+
+```{r}
+library("bayesplot")
+library("ggplot2")
+library("rstan")
+```
+
+
+```{r}
+library("ggmcmc")
+```
+```{r}
+ggmcmc(mysamples)
+```
+

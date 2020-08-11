@@ -1,0 +1,76 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+# 13.1.1
+```{r}
+mean(rbeta(n = 100, shape1 = 1, shape2 = 1))
+```
+```{r}
+fPriorPredictive <- function(numSamples, a, b, N){
+  lX <- vector(length = numSamples)
+  for(i in 1:numSamples){
+    theta <- rbeta(n = 1, shape1 = a, shape2 = b)
+    lX[i] <- rbinom(n = 1, size = N, prob = theta )
+    #cat("\n\n theta: ", theta)
+    #cat("\n lX[i] : ", lX[i])
+  }
+  
+  return(lX)
+}
+
+lX <- fPriorPredictive(1000, 1, 1, 100)
+cat("\n Mean: ", mean(lX))
+hist(lX)
+```
+#13.3.2
+```{r}
+curve(dbeta(x, shape1 = 7, shape2 = 102))
+cat(7/102)
+abline(v=7/102)
+```
+
+#13.3.3
+```{r}
+fPosteriorIndependent <- function(numSamples, a, b, N){
+  lX <- vector(length = numSamples)
+  for(i in 1:numSamples){
+    lX[i] <- rbeta(n = 1,shape1 = a, shape2 = b)
+  }
+  
+  return(lX)
+}
+
+lX <- fPosteriorIndependent(100, 7, 102, 100)
+cat("\n Mean: ", mean(lX))
+#hist(lX)
+#cat("\nlX", lX)
+plot(density(lX), col="blue")
+curve(dbeta(x, shape1 = 7, shape2 = 102), add=T, col="orange")
+
+```
+#13.1.4
+```{r}
+all_means <- vector()
+all_sds <- vector()
+j = 1
+for ( i in seq(from=1, to=1000, by = 1)){
+  temp <- fPosteriorIndependent(i, 7, 102, 100)
+  #cat("\n temp: ", temp)
+  all_means[j] <- mean(temp)
+  all_sds[j] <- sd(temp, na.rm = TRUE)/sqrt(i)
+  j <- j + 1
+}
+```
+
+```{r}
+plot(all_means, ylim = c(0.05, 0.1))
+abline(h=0.069, col="red")
+mean(all_means)
+
+#cat(all_sds)
+plot(all_sds, ylim = c(0.000, 0.008))
+lines(all_sds)
+summary(all_sds)
+```
+

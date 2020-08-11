@@ -1,0 +1,43 @@
+---
+title: "10.3 Discoveries"
+output: html_notebook
+---
+
+```{r}
+fPosteriorPredictive <- function(numSamples, alpha, beta){
+  X <- vector(length=numSamples)
+  for(i in 1:numSamples){
+    aLambda <- rgamma(1, alpha, beta)
+    X[i] <-rpois(1, aLambda)
+  }
+return(X) 
+  }
+```
+
+```{r}
+discov <- read.csv("evaluation_discoveries.csv")
+head(discov)
+```
+
+```{r}
+plot(discov$time, discov$discoveries, xlab="Year", ylab="#Discoveries")
+```
+```{r}
+#Prior Gamma
+curve(dgamma(x, 2, 0.5), 0, 20)
+```
+
+```{r}
+#Likelihood Gamma
+curve(dpois(x, discov$discoveries), 0, 40)
+```
+```{r}
+PPC.X <- fPosteriorPredictive(100, 2+sum(discov$discoveries), 0.5 + 100)
+hist(PPC.X, xlab='X', main='10,000 posterior predictive samples', col="pink")
+hist(discov$discoveries, add=T)
+```
+```{r}
+hist(discov$discoveries)
+```
+
+

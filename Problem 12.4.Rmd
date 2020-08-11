@@ -1,0 +1,118 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+#12.4.2
+
+```{r}
+par(mfrow=c(1,3))
+
+hist(replicate(1000, mean(rbinom(n=10, size = 1,  prob=1/2))), main = "N=10", xlab = "estimate of mean")
+hist(replicate(1000, mean(rbinom(n=20, size = 1,  prob=1/2))), main = "N=20", xlab = "estimate of mean")
+hist(replicate(1000, mean(rbinom(n=100, size = 1,  prob=1/2))), main = "N=100", xlab = "estimate of mean")
+
+```
+
+
+
+#12.4.3
+```{r}
+
+lerrors <- vector()
+i <- 1
+for (epsilon in seq(from = 0, to = 0.5, length.out = 10 )){
+  lerrors[i] <- mean(replicate(1000, mean(rbinom(n=10, size = 1,  prob=1/2 + epsilon)) - 0.5))
+  i <- i + 1
+}
+
+plot(seq(from = 0, to = 0.5, length.out = 10 ), lerrors, col = "blue")
+lines(seq(from = 0, to = 0.5, length.out = 10 ), lerrors, col = "blue")
+lerrors
+
+```
+
+```{r}
+epsilon <- seq(from = 0, to = 0.5, length.out = 10 )
+first_throw <- rbinom(n=1, size=1, prob = 1/2)
+cat("\nFirst Throw: ",first_throw)
+count <- 1
+N <- 10
+last_throw <- first_throw
+ep <- 0.1
+all_throws <- vector()
+all_throws[count] <- first_throw
+
+j <- 1
+for (ep in epsilon) {
+  count <- 1
+  while (count < N){
+    if(last_throw == 1){
+      throw <- rbinom(n=1, size=1, prob = 1/2 + ep)
+    }
+    else{
+      throw <- rbinom(n=1, size=1, prob = 1/2 - ep)
+    }
+    count <- count + 1
+    all_throws[count] <- throw
+    last_throw <- throw
+  }
+  
+  lerrors [j] <- abs(mean(all_throws) - 0.5)
+  j <- j + 1
+  
+}
+plot(epsilon,lerrors)
+lines(epsilon, lerrors)
+```
+
+
+```{r}
+epsilon <- seq(from = 0, to = 0.5, length.out = 10 )
+
+first_throw <- rbinom(n=1, size=1, prob = 1/2)
+last_throw <- first_throw
+cat(first_throw)
+lerrors <- vector()
+i <- 0
+for (ep in epsilon){
+  lerrors[i] <- replicate(1000, rbinom(n=100, size = 1, prob = (ifelse( last_throw==1, ep, -ep))))
+  i <- i +1
+}
+
+
+
+```
+```{r}
+mean(replicate(1000, mean(rbinom(n=20, size = 1,  prob=1/2 + 0.1)))) - 0.5
+```
+```{r}
+set.seed(42)
+
+markov_coin <- function(n, prob_head = .5, eps = .1) {
+  res <- vector("integer", n)
+  for (s in seq(n)) {
+    res[s] <- if (s == 1) {
+      rbinom(1, 1, prob_head)
+    } else {
+      rbinom(1, 1, prob_head + ifelse(res[s-1] == 1, eps, -eps))
+    }
+  }
+  res
+}
+
+epsilon <- seq(0, .5, length.out = 10)
+svec <- c(10, 20, 100)
+
+res <- matrix(nrow = 10, ncol = 3)
+for (s in seq_along(svec)) {
+  for (eps in seq_along(epsilon)) {
+    res[eps, s] <- sd(replicate(1000, mean(markov_coin(svec[[s]], .5, epsilon[eps])))) 
+  }
+}
+
+plot(epsilon, res[,1], "b", col="blue", xlab = "epsilon", ylab = "error", ylim = c(0, .5))
+lines(epsilon, res[,2], "b", col="orange")
+lines(epsilon, res[,3], "b", col="green")
+```
+

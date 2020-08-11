@@ -1,0 +1,50 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+#12.3.1
+```{r}
+mean(rnorm(n=10000)^6)
+```
+#12.3.3
+
+```{r}
+library("truncnorm")
+mean(rtruncnorm(n=10000, a=1, b=Inf)^3)
+```
+```{r}
+n=10000
+count <-0
+lsamples <- vector(length = n)
+while (count < n){
+  x <- rtruncnorm(n = 1, a = 1, b = Inf)
+  lsamples[count] <- x^6 * exp(-2 * x)
+  count <- count + 1
+}
+
+lmean = mean(lsamples)
+hist(lsamples)
+cat(lmean)
+abline(v=lmean)
+```
+#12.3.4
+```{r}
+n=1000
+count <- 0
+lsamples <- vector(length = n)
+while (count < n){
+  x <- runif(n = 1, min = 1, max = 10)
+  lsamples[count] <- 9 * exp(- x^4 / 2) * x^6 / sqrt(2 * pi)
+  count <- count + 1
+}
+
+lmean = mean(lsamples)
+cat(lmean)
+hist(lsamples)
+abline(v=lmean)
+
+```
+
+
+
