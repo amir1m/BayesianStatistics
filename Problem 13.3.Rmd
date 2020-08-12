@@ -41,12 +41,12 @@ fPosteriorIndependent <- function(numSamples, a, b, N){
   return(lX)
 }
 
-lX <- fPosteriorIndependent(100, 7, 102, 100)
+lX <- fPosteriorIndependent(100, 7, 95, 100)
 cat("\n Mean: ", mean(lX))
 #hist(lX)
 #cat("\nlX", lX)
-plot(density(lX), col="blue")
-curve(dbeta(x, shape1 = 7, shape2 = 102), add=T, col="orange")
+plot(density(lX), col="blue", ylim=c(0,20))
+curve(dbeta(x, shape1 = 7, shape2 = 95), add=T, col="orange")
 
 ```
 #13.1.4
@@ -55,8 +55,7 @@ all_means <- vector()
 all_sds <- vector()
 j = 1
 for ( i in seq(from=1, to=1000, by = 1)){
-  temp <- fPosteriorIndependent(i, 7, 102, 100)
-  #cat("\n temp: ", temp)
+  temp <- fPosteriorIndependent(i, 7, 95, 100)
   all_means[j] <- mean(temp)
   all_sds[j] <- sd(temp, na.rm = TRUE)/sqrt(i)
   j <- j + 1
@@ -65,7 +64,7 @@ for ( i in seq(from=1, to=1000, by = 1)){
 
 ```{r}
 plot(all_means, ylim = c(0.05, 0.1))
-abline(h=0.069, col="red")
+abline(h=0.06862745, col="red")
 mean(all_means)
 
 #cat(all_sds)
@@ -73,4 +72,104 @@ plot(all_sds, ylim = c(0.000, 0.008))
 lines(all_sds)
 summary(all_sds)
 ```
+#13.1.5
+```{r}
+all_means <- vector()
+all_sds <- vector()
+all_variance <- vector()
+j = 1
+for ( i in seq(from=1, to=1000, by = 1)){
+  temp <- fPosteriorIndependent(i, 7, 95, 100)
+  all_means[j] <- mean(temp)
+  all_sds[j] <- sd(temp, na.rm = TRUE)/sqrt(i)
+  all_variance[j] <- var(temp)
+  j <- j + 1
+}
+
+```
+
+```{r}
+hist(all_variance)
+```
+#13.1.6
+```{r}
+fproposal <- function(theta, step_size){
+  theta_proposed <- rnorm(n=1, mean=theta, sd=step_size) %% 1
+  cat("\n Proposing theta: ", theta_proposed)
+  return (theta_proposed)
+
+}
+```
+
+```{r}
+facceptReject <- function(theta_current, theta_proposed){
+  r <- ((pbinom(q=6, size = 100, prob = theta_proposed) * pbeta(q = theta_proposed, shape1 = 1, shape2 = 1)))  / ((pbinom(q=6, size = 100, prob = theta_current) *  pbeta(q = theta_current, shape1 = 1, shape2 = 1)))
+
+  cat("\nr : ", r)
+  if (r > runif(1, min = 0, max = 1)){
+    return(theta_proposed)
+  }
+  else{
+    return(theta_current)
+  }
+  
+  
+  
+  # r <- 0
+  # likelihood_current <- pbinom(q=6, size = 100, prob = theta_current)
+  # prior_current <- pbeta(q = theta_current, shape1 = 1, shape2 = 1)
+  # 
+  # likelihood_proposed <- pbinom(q=6, size = 100, prob = theta_proposed)
+  # prior_proposed <- pbeta(q = theta_proposed, shape1 = 1, shape2 = 1)
+  # 
+  # if (likelihood_proposed * prior_proposed >= likelihood_current * prior_current){
+  #   r <- 1
+  # }
+  # else{
+  #   r <- (likelihood_proposed * prior_proposed) / (likelihood_current * prior_current)
+  # }
+  # cat ("\n\nr :",r)
+  # if(r > runif(1, 0,1)){
+  #   return(theta_proposed)
+  # }
+  # else{
+  #   return(theta_current)
+  # }
+  # 
+}
+
+
+```
+
+
+#13.1.8
+```{r}
+  
+frwm <- function(theta_current, step_size = 0.1){
+  cat("\n\n theta_current: ", theta_current)
+  theta_proposed <- fproposal(theta_current,step_size)
+  cat("\ntheta_proposed:", theta_proposed)
+  theta_accepted <- facceptReject(theta_current,theta_proposed)
+  cat("\nAccepted theta: ", theta_accepted)
+  return(theta_accepted)
+}
+```
+
+#13.1.9
+
+```{r}
+fsampler <- function(numSamples, step_size = 0.1){
+  ltheta <- vector()
+  theta <- runif(n = 1, min = 0, max = 1)
+  for (t in seq(numSamples)){
+    ltheta[t] <- frwm(theta, step_size)
+  }
+  return(ltheta)
+}
+step_size <- 0.1
+s <- fsampler(100,step_size )
+plot(density(s))
+cat("\n\n\n Mean:", mean(s))
+```
+
 
