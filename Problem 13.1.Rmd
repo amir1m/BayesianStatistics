@@ -189,6 +189,65 @@ cat(mean(lsamples_mean[500:1000]))
 abline(v=0.07, col="blue")
 ```
 
+#13.1.13
+```{r}
+step2_size = 0.01
+step2_sample_size = 200
+
+step2_lsamples_matrix <- matrix(0,nrow = 1000, ncol = step2_sample_size)
+step2_lsamples_mean <- vector(length = 1000)
+
+
+for(chain in 1:1000){
+  step2_lsamples_matrix[chain,] <- fsampler(step2_sample_size, step2_size)
+  step2_lsamples_mean[chain] <- mean(step2_lsamples_matrix[chain,])
+}
+```
+
+
+```{r}
+hist(step2_lsamples_mean)
+abline(v=0.06, )
+```
+```{r}
+set.seed(41)
+plot(density(fsampler(100, 0.1)), col="grey", xlab = "theta", ylab = "pdf", main = "Fig 13.6 Left : MCMC runs using two step sizes versus the actual")
+lines(density(fsampler(200, 0.01)), col="orange")
+curve(dbeta(x, shape1 = 7, shape2 = 102), add = T, col="blue")
+legend(0.15,20, legend=c("step size = 0.1", "step size = 0.01", "exact"),
+       col=c("grey", "orange", "blue"), lty=1, cex=0.8)
+
+```
+
+```{r}
+set.seed(40)
+plot(fsampler(200, 0.1), type = 'l', col="grey", xlab = "step#", ylab = "theta", main = "Fig 13.6 Right: The evolution of the path of each Markov Chain over time")
+lines(fsampler(200, 0.01), type = 'l', col="orange")
+legend(150,0.6, legend=c("step size = 0.1", "step size = 0.01"),
+       col=c("grey", "orange"), lty=1, cex=0.8)
+
+
+```
+
+#13.1.14
+
+```{r}
+set.seed(40)
+plot(density(fsampler(200, 0.1)), col="grey", xlab = "theta", ylab = "pdf", ylim = c(0, 20), main = "Fig 13.7 Left")
+lines(density(fsampler(200, 1)), col="orange")
+curve(dbeta(x, shape1 = 7, shape2 = 102), add = T, col="blue")
+legend(0.5, 18, legend=c("step size = 0.1", "step size = 1", "exact"),
+       col=c("grey", "orange", "blue"), lty=1, cex=0.8)
+```
+#13.1.15
+##New Posterior Exactly
+```{r}
+set.seed(42)
+plot(density(fPosteriorIndependent(100, 1+6+3+2+8+25, 1+500-(6+3+2+8+25), 100)),col="grey")
+curve(dbeta(x, shape1 = 1+6+3+2+8+25, shape2 = 1+500-(6+3+2+8+25)),add=T,  col = "blue")
+lines(fsampler(100, 0.1))
+```
+## Using Sampling
 
 
 
