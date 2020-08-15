@@ -1,0 +1,122 @@
+---
+title: "Problem 13.2 The fairground revisited"
+output: html_notebook
+---
+_From: Ben Lambert. “A Student’s Guide to Bayesian Statistics”._
+
+__You again find yourself in a fairground, and where there is a stall offering the chance to win money if you participate in a game. Before participating you watch a few other plays of the game (by other people in the crowd) to try to determine whether you want to play.__
+
+
+## 13.2.1
+
+In the most-boring version of the game, a woman flips a coin and you bet on its outcome. If the coin lands heads-up, you win; if tails, you lose. Based on your knowledge of similar games (and knowledge that the game must be rigged for the woman to make a profit!) you assume that the coin must be biased towards tails. As such you decide to specify a prior on the probability of the coin falling heads-up as θ ∼ beta(2, 5). Graph this function, and – using your knowledge of the beta distribution – determine the mean parameter value specified by this prior.
+
+
+```{r}
+curve(dbeta(theta, shape1 = 2, shape2 = 5), xname='theta', xlab='theta', ylab='likelihood')
+cat("mean : ", (2/(2+5)))
+```
+
+## 13.2.2
+You watch the last 10 plays of the game, and the outcome is heads 3/10 times. Assuming a binomial likelihood, create a function that determines the likelihood for a given value of the probability of heads, θ. Hence or otherwise, determine the maximum likelihood estimate of θ.
+
+```{r}
+plot(seq(from = 0, to = 1, by = 0.01), dbinom(x = 3, size = 10, prob = seq(from = 0, to = 1, by = 0.01)), xlab='theta', ylab='likelihood')
+abline(v=0.3, col="blue")
+
+```
+```{r}
+fLikelihood <- function(Z, theta, N){
+  return(dbinom(Z, N, theta))
+}
+```
+
+```{r}
+curve(fLikelihood(3, theta, 10), 0, 1, xname="theta", xlab='theta', ylab='likelihood')
+abline(v=0.3, col="blue")
+```
+
+
+## 13.2.3
+Graph the likelihood × prior. From the graph approximately determine the MAP θ estimate value.
+
+```{r}
+curve(flikelihood(theta, 3, 10) * dbeta(theta, shape1 = 2, shape2 = 5), xname = "theta", ylab = "likelihood x prior")
+abline(v=0.27 ,col="blue")
+
+```
+```{r}
+fLikelihoodTimesPrior <- function(Z, theta, N, a, b){
+  return(fLikelihood(Z, theta, N) * dbeta(theta, a, b))
+}
+
+```
+
+```{r}
+curve(fLikelihoodTimesPrior(3, theta, 10, 2, 5),xname='theta', xlab='theta')
+abline(v=0.27 ,col="blue")
+```
+
+
+```{r}
+ optim(0.5, function(theta) -fLikelihoodTimesPrior(3, theta, 10, 2, 5),lower=0, upper=1, method="L-BFGS-B")
+```
+
+## 13.2.4. 
+By using R’s integrate function find the denominator, and hence graph the posterior pdf.
+```{r}
+integrate(function(theta) fLikelihoodTimesPrior(3, theta, 10, 2, 5),lower=0, upper=1)
+
+```
+
+```{r}
+fPosterior <- function(Z, theta, N, a, b){
+  aInt = integrate(function(theta1) fLikelihoodTimesPrior(Z, theta1, N, a, b), 0, 1)[[1]]
+  return((1 / aInt) * fLikelihood(Z, theta, N) * dbeta(theta, a, b))
+}
+curve(fPosterior(3, theta, 10, 2, 5), 0, 1, xname = 'theta', xlab = 'theta', ylab = 'pdf')
+```
+
+## 13.2.5. 
+Use your posterior to determine your break-even/fair price for participating in the game, assuming that you win £1 if the coin comes up heads, and zero otherwise.
+
+```{r}
+integrate(function(theta) theta * fPosterior(3, theta, 10, 2, 5), 0, 1)
+
+```
+
+## 13.2.8. 
+Using R’s optim function determine the maximum likelihood estimate of the parameters for Yi = (3,0,4,2,1,2,0,0,5,1).
+Hint 1: Since R’s optim function does minimisation by default, you will need to put a minus sign
+in front of the function to maximise it.
+
+```{r}
+fLogLikelihoodHarderAll <- function(lY, theta, phi){
+  N0 <- sum(lY == 0)
+  N1 <- sum(lY > 0)
+  lY1 <- lY[lY > 0]
+  aLogLikelihood <- N0 * log((1 - theta) + theta * (1 - phi) ^ 10) +
+                    N1 * log(theta) +
+                    sum(sapply(lY1, function(Y) log(choose(10, Y) * phi ^ Y * (1 - phi) ^ (10 - Y))))
+  return(aLogLikelihood)
+}
+
+```
+
+```{r}
+lY <- c(3,0,4,2,1,2,0,0,5,1)
+optim(c(0.2, 0.2), function(theta) -fLogLikelihoodHarderAll(lY, theta[1], theta[2]),
+      lower = c(0.001, 0.001), upper=c(0.999, 0.999), method="L-BFGS-B")
+```
+
+## 13.2.10. 
+Assuming uniform priors for both θ and φ create a function in R that calculates the unnormalised posterior (the numerator of Bayes’ rule).
+
+```{r}
+
+fUnnormalisedPosterior <- function(lY, theta, phi){
+  return(fLikelihoodHarderAll(lY, theta, phi))
+}
+
+```
+
