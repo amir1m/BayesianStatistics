@@ -14,31 +14,9 @@ Assuming priors of the form: $\pi ∼ beta(α_ψ,β_π), S ∼ beta(α_S,β_S)$ 
 \centering
 ![equations](images/Equations_Problem_14_1_2.png)
 
-Priors
-```{r}
-# Priors
-alpha_pi = 1
-beta_pi = 1
-alpha_S = 1
-beta_S = 1
-alpha_C = 1
-beta_C = 1
-
-```
-
 
 ```{r}
 fGibbsSampling <- function(numSamples,a, b){
-  
-  Y1[1] <- as.integer(runif(1, 1, a))
-  
-  Y2[1] <- as.integer(runif(1, a, b+a))
-  
-  lpi[1] <- runif(1, 0, 1)
-  
-  S[1] <- runif(1, 0, 1)
-  
-  C[1] <- runif(1, 0, 1)
   
   # cat("\nBefore Loop: ")
   # cat("\nY1:",Y1, " Y2: ", Y1, " lp: ", lpi, " S: ", S, " C: ", C)
@@ -84,7 +62,99 @@ lpi <- vector()
 S <- vector()
 C <- vector()
 
-s_lpi <- fGibbsSampling(10000, 80, 20)
+a <- 80
+b <- 20
 
+Y1[1] <- as.integer(runif(1, 1, a))
+  
+Y2[1] <- as.integer(runif(1, a, b+a))
+  
+lpi[1] <- runif(1, 0, 1)
+  
+S[1] <- runif(1, 0, 1)
+  
+C[1] <- runif(1, 0, 1)
+
+# Priors
+alpha_pi = 1
+beta_pi = 1
+alpha_S = 1
+beta_S = 1
+alpha_C = 1
+beta_C = 1
+
+fGibbsSampling(20000, a, b)
+
+```
+
+# Problem 14.1.4
+Suppose that a previous study that compares the clinical test with a laboratory gold standard concludes that S ∼ beta(10, 1) and C ∼ beta(10, 1). Use Gibbs sampling to estimate the new posterior for π. Why does this look different to your previously-estimated distribution?
+
+```{r}
+set.seed(41)
+Y1 <- vector()
+Y2 <- vector()
+lpi <- vector()
+S <- vector()
+C <- vector()
+
+a <- 80
+b <- 20
+
+Y1[1] <- as.integer(runif(1, 1, a))
+  
+Y2[1] <- as.integer(runif(1, a, b+a))
+  
+lpi[1] <- runif(1, 0, 1)
+  
+S[1] <- runif(1, 0, 1) 
+  
+C[1] <- runif(1, 0, 1) 
+
+# Priors
+alpha_pi = 1
+beta_pi = 1
+alpha_S = 10 # Updated prior
+beta_S = 1
+alpha_C = 10 # Updated prior
+beta_C = 1
+
+fGibbsSampling(20000, a, b)
+
+```
+
+#Problem 14.1.5
+Suppose a previous analysis concluded that π ∼ beta(1, 10). Using this distribution as a prior, together with uniform priors on S and C, determine the posterior distributions for the test sensitivity and specificity respectively. Why does the test appear to be quite specific, although it is unclear how sensitive it is?
+
+```{r}
+set.seed(41)
+Y1 <- vector()
+Y2 <- vector()
+lpi <- vector()
+S <- vector()
+C <- vector()
+
+a <- 80
+b <- 20
+
+Y1[1] <- as.integer(runif(1, 1, a))
+  
+Y2[1] <- as.integer(runif(1, a, b+a))
+  
+lpi[1] <- runif(1, 0, 1)
+  
+S[1] <- runif(1, 0, 1)
+  
+C[1] <- runif(1, 0, 1)
+
+# Priors
+alpha_pi = 1
+beta_pi = 10
+alpha_S = 1
+beta_S = 1
+alpha_C = 1
+beta_C = 1
+
+fGibbsSampling(20000, a, b)
 ```
 
