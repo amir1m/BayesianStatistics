@@ -83,15 +83,4 @@ C <- vector()
 s_lpi <- fGibbsSampling(1000, 80, 20)
 
 ```
-```{r}
-dbinom(x=80, size = 1, prob =0.5)
-```
-
-```{r}
-lpi
-```
-
-```{r}
-as.integer(5.1)
-```
 
