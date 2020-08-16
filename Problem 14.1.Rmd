@@ -32,7 +32,6 @@ beta_C = 1
 ```{r}
 fGibbsSampling <- function(numSamples,a, b){
   
-  N <- a + b
   Y1[1] <- as.integer(runif(1, 1, a))
   
   Y2[1] <- as.integer(runif(1, a, b+a))
@@ -43,8 +42,8 @@ fGibbsSampling <- function(numSamples,a, b){
   
   C[1] <- runif(1, 0, 1)
   
-  cat("\nBefore Loop: ")
-  cat("\nY1:",Y1, " Y2: ", Y1, " lp: ", lpi, " S: ", S, " C: ", C)
+  # cat("\nBefore Loop: ")
+  # cat("\nY1:",Y1, " Y2: ", Y1, " lp: ", lpi, " S: ", S, " C: ", C)
   for(t in 2:numSamples){
     
     Y1[t] <- rbinom(n = 1, size = a, prob =  lpi[t-1] * S[t-1] / (lpi[t-1] * S[t-1] + (1 - lpi[t-1]) * (1 - C[t-1]) ))
@@ -62,6 +61,10 @@ fGibbsSampling <- function(numSamples,a, b){
   }
   
   hist(lpi)
+  hist(Y1)
+  hist(Y2)
+  hist(S)
+  hist(C)
   
 }
   
@@ -80,7 +83,7 @@ lpi <- vector()
 S <- vector()
 C <- vector()
 
-s_lpi <- fGibbsSampling(1000, 80, 20)
+s_lpi <- fGibbsSampling(10000, 80, 20)
 
 ```
 
