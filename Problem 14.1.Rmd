@@ -1,7 +1,5 @@
 ---
 title: "Problem 14.1"
-includes:
-      in_header: "preamble.tex"
 output:
   pdf_document:
     latex_engine: xelatex
@@ -46,11 +44,14 @@ fGibbsSampling <- function(numSamples,a, b){
   # cat("\nY1:",Y1, " Y2: ", Y1, " lp: ", lpi, " S: ", S, " C: ", C)
   for(t in 2:numSamples){
     
-    Y1[t] <- rbinom(n = 1, size = a, prob =  lpi[t-1] * S[t-1] / (lpi[t-1] * S[t-1] + (1 - lpi[t-1]) * (1 - C[t-1]) ))
+    Y1[t] <- rbinom(n = 1, size = a, prob =  lpi[t-1] * S[t-1] / 
+                      (lpi[t-1] * S[t-1] + (1 - lpi[t-1]) * (1 - C[t-1]) ))
     
-    Y2[t] <- rbinom(n=1, size = b, prob = lpi[t-1] * (1 - S[t-1]) / (lpi[t-1] * (1 - S[t-1]) + (1 - lpi[t-1]) * C[t-1]))
+    Y2[t] <- rbinom(n=1, size = b, prob = lpi[t-1] * (1 - S[t-1]) / 
+                      (lpi[t-1] * (1 - S[t-1]) + (1 - lpi[t-1]) * C[t-1]))
     
-    lpi[t] <- rbeta(1, Y1[t] + Y2[t] + alpha_pi, a + b - Y1[t] - Y2[t] + beta_pi)
+    lpi[t] <- rbeta(1, Y1[t] + Y2[t] + alpha_pi, a + b - Y1[t] - 
+                      Y2[t] + beta_pi)
     
     S[t] <- rbeta(1, Y1[t] + alpha_S, Y2[t] + beta_S)
     
