@@ -142,3 +142,11 @@ ci(mTest, method = "HDI", ci = 0.95)
 
 ```
 
+# 14.2.11. 
+Using your sampler determine posterior median estimates for λ1 and λ2.
+
+```{r}
+median(mTest$lambda.1)
+median(mTest$lambda.2)
+```
+
