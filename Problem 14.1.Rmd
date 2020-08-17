@@ -28,7 +28,7 @@ fGibbsSampling <- function(numSamples,a, b){
     Y2[t] <- rbinom(n=1, size = b, prob = lpi[t-1] * (1 - S[t-1]) / 
                       (lpi[t-1] * (1 - S[t-1]) + (1 - lpi[t-1]) * C[t-1]))
     
-    lpi[t] <- rbeta(1, Y1[t] + Y2[t] + alpha_pi, a + b - Y1[t] - 
+    lpi[t] <- rbeta(1, shY1[t] + Y2[t] + alpha_pi, a + b - Y1[t] - 
                       Y2[t] + beta_pi)
     
     S[t] <- rbeta(1, Y1[t] + alpha_S, Y2[t] + beta_S)
@@ -98,8 +98,8 @@ lpi <- vector()
 S <- vector()
 C <- vector()
 
-a <- 80
-b <- 20
+a <- 20
+b <- 80
 
 Y1[1] <- as.integer(runif(1, 1, a))
   
@@ -115,7 +115,7 @@ C[1] <- runif(1, 0, 1)
 alpha_pi = 1
 beta_pi = 1
 alpha_S = 10 # Updated prior
-beta_S = 1
+beta_S = 10
 alpha_C = 10 # Updated prior
 beta_C = 1
 
@@ -134,8 +134,8 @@ lpi <- vector()
 S <- vector()
 C <- vector()
 
-a <- 80
-b <- 20
+a <- 20
+b <- 80
 
 Y1[1] <- as.integer(runif(1, 1, a))
   
