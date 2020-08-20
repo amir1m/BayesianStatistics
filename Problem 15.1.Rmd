@@ -94,26 +94,118 @@ Create a function called “RWMetropolis” that takes a starting value of θ an
 ```{r}
 RWMetropolis <- function(theta, N) {
   if (ldebug == 1) cat("\nRWMetropolis: theta = ", theta)
+  
+  nRejected <- 0
+  nextSample <- matrix(nrow = 1, ncol = 2)
+  
   ltheta <- matrix(nrow = N, ncol = 2)
   ltheta[1,] <- theta
   
   for (t in 2:N){
-    ltheta[t,] <- fSample(ltheta[t-1,])
+    nextSample[1,] <- fSample(ltheta[t-1,])
+  
+    ifelse(nextSample[1,] == ltheta[t-1,], nRejected <- nRejected + 1, 0)
+    
+    ltheta[t,] <- nextSample[1,]
+    
   }
   
-  return(ltheta)
+  result <- list("nRejected" = nRejected , "samples" = ltheta)
+  return(result)
 }
 ```
 
+# 15.1.2
 ```{r}
-theta_starting <- c(15,3)
-lRWMsamples <- RWMetropolis(theta_starting, 100)
+theta_starting <- c(10,5)
+ldebug <- 0
+result <- RWMetropolis(theta_starting,100)
+noOfRejectedSamples <- result$"nRejected"
+lRWMsamples <- result$samples
+
+cat("\n No. of Rejected Samples: ", noOfRejectedSamples)
+cat("\n % of rejected samples = ", noOfRejectedSamples/(100 + noOfRejectedSamples) )
+
 ```
 
 
 ```{r}
-plot(lRWMsamples, type = 'l')
+plot(lRWMsamples, type = 'l', xlab = "mu_t", ylab = "mu_c", main = "Random Wlak Metropolis")
 ```
+
+```{r}
+hist(lRWMsamples[,2], col ="blue", xlab = "mu_c")
+hist(lRWMsamples[,1], col ="orange", xlab = "mu_t")
+```
+
+# 15.1.3
+```{r}
+acceptancePerc <- vector()
+for(i in 1:100) {
+  result <- RWMetropolis(theta_starting,100)
+  acceptancePerc[i] <- result$"nRejected" / (100 + result$"nRejected")
+}
+
+hist(acceptancePerc, xlab = "acceptance %", main = "RWM Acceptance %", col = "blue")
+
+```
+
+# 15.1.4
+```{r}
+fWithin <- function(lSamples){
+  return(mean(sapply(lSamples, var)))
+}
+## Testing it
+#lSamples <- lapply(seq(1, 10, 1), function(i) rbinom(100, 100, 0.5))
+#fWithin(lSamples)
+```
+
+```{r}
+fBetween <- function(lSamples){
+  lMean <- sapply(lSamples, mean)
+  aMean <- mean(lMean)
+  m <- length(lSamples)
+  t <- length(lSamples[[1]])
+  return((t / (m - 1)) * sum((lMean - aMean) ^ 2))
+}
+  
+```
+
+```{r}
+fRhat <- function(lSamples){
+  W <- fWithin(lSamples)
+  B <- fBetween(lSamples)
+  t <- length(lSamples[[1]])
+  return(sqrt((W + (1 / t) * (B - W)) / W))
+}
+```
+
+
+# 15.1.5
+```{r}
+theta_starting <- c(20,5)
+numSamples <- 5
+
+acceptancePerc <- vector()
+
+lSamples <- list()
+
+for(i in 1:8) {
+  result <- RWMetropolis(theta_starting,numSamples)
+  lRWMsamples <- result$samples
+  lSamples[[i]] <- lRWMsamples
+  acceptancePerc[i] <- result$"nRejected" / (numSamples + result$"nRejected")
+}
+
+lRhat <- fRhat(lSamples)
+```
+
+```{r}
+cat("\nRhat : ", lRhat)
+cat("\n Rejected % : ", rejectedPerc)
+```
+
+# 15.1.6
 
 ```{r}
 
