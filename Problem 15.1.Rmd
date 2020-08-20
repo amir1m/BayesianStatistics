@@ -146,7 +146,7 @@ for(i in 1:100) {
   acceptancePerc[i] <- result$"nRejected" / (100 + result$"nRejected")
 }
 
-hist(acceptancePerc, xlab = "acceptance %", main = "RWM Acceptance %", col = "blue")
+hist(acceptancePerc, xlab = "rejection %", main = "RWM ARejection %", col = "blue")
 
 ```
 
@@ -202,12 +202,54 @@ lRhat <- fRhat(lSamples)
 
 ```{r}
 cat("\nRhat : ", lRhat)
-cat("\n Rejected % : ", rejectedPerc)
+cat("\n Rejected % : ", acceptancePerc)
 ```
 
 # 15.1.6
 
 ```{r}
+
+numSamples <- 1000
+acceptancePerc <- vector()
+lSamples <- list()
+
+for(i in 1:8) {
+  theta_starting <- mvrnorm(n=1, c(20, 5), Sigma = 40 * diag(2))
+  result <- RWMetropolis(theta_starting,numSamples)
+  lRWMsamples <- result$samples
+  lSamples[[i]] <- lRWMsamples
+  acceptancePerc[i] <- result$"nRejected" / (numSamples + result$"nRejected")
+}
+
+lRhat <- fRhat(lSamples)
+
+```
+
+
+```{r}
+cat("\nRhat : ", lRhat)
+cat("\nRejected % : ", acceptancePerc)
+
+```
+
+```{r}
+
+mu_t <- matrix(nrow = 8, ncol = numSamples)
+mu_c <- matrix(nrow = 8, ncol = numSamples)
+
+for (i in 1:8) {
+  mu_t[i,] <- lSamples[[i]][,1]
+  mu_c[i,] <- lSamples[[i]][,2]
+}
+
+
+```
+
+```{r}
+#plot(mu_t[7,], type = "l")
+
+#plot(mu_t, type = "l", col="blue")
+matplot(mu_t, type = "l")
 
 ```
 
