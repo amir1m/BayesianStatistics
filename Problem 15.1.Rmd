@@ -233,6 +233,11 @@ cat("\nRejected % : ", acceptancePerc)
 ```
 
 ```{r}
+dim(lSamples[[1]])
+```
+
+
+```{r}
 
 mu_t <- matrix(nrow = 8, ncol = numSamples)
 mu_c <- matrix(nrow = 8, ncol = numSamples)
@@ -245,11 +250,23 @@ for (i in 1:8) {
 
 ```
 
-```{r}
-#plot(mu_t[7,], type = "l")
 
-#plot(mu_t, type = "l", col="blue")
-matplot(mu_t, type = "l")
+```{r}
+palette()
+```
+
+
+```{r}
+
+plot(mu_t[1,], type="l", col=1, ylim = c(0, 35), xlab = "iteration#", 
+     ylab = expression(paste(mu[t])), 
+     main = expression(paste("Figure 15.5: The path taken by each chain in ", μ[t]," space")))
+
+for(i in 2:8){
+  lines(mu_t[i,], type="l", col=i)
+}
 
 ```
+
+
 
