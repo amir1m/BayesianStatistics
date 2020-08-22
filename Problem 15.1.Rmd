@@ -236,6 +236,7 @@ cat("\nRejected % : ", acceptancePerc)
 dim(lSamples[[1]])
 ```
 
+# 15.1.7
 
 ```{r}
 
@@ -270,7 +271,7 @@ for(i in 2:8){
 
 ```{r}
 plot(mu_c[1,], type="l", col=1, ylim = c(0, 15), xlab = "iteration#", 
-     ylab = expression(paste(mu[t])), 
+     ylab = expression(paste(mu[c])), 
      main = expression(paste("Figure 15.5 : The path taken by each chain in ", μ[c]," space")))
 
 for(i in 2:8){
