@@ -279,4 +279,131 @@ for(i in 2:8){
 }
 ```
 
+# 15.1.8
+The conditional distributions of each variable are given by:
+μt ∼N(20+1.6(μc −5),(1−0.82)2) μc ∼N(5+0.4(μt −20),(1−0.82)0.5)
+Use this information to code up a Gibbs sampler, again starting at (μt,μc) = (10,5). (Hint: in R use rnorm, or equivalent to create two functions: one that produces draws of μt given μc; and the other that produces draws of μc given μt. Then create a function that cycles between these updates. Make sure to always draw samples using the most recent values of (μt,μc)).
+
+```{r}
+
+fGetmu_t <- function(mu_c){
+  result <- rnorm(n = 1, mean = (20 + 1.6*(mu_c - 5)), sd = (1 - 0.8^2)*2)
+  
+  return(result)
+}
+```
+
+```{r}
+fGetmu_c <- function(mu_t){
+  result <- rnorm(n = 1, mean = (5 + 0.4 *(mu_t - 20)), sd = (1 - 0.8^2)*0.5)
+  return(result)
+}
+
+```
+
+
+```{r}
+fGibbs <- function(theta_starting, numSamples) {
+  lSamples = matrix(nrow = numSamples, ncol = 2)
+  
+  lSamples[1,] <- theta_starting
+  
+  for(i in 2:numSamples){
+    mu_t_i <- fGetmu_t(lSamples[i-1,2])
+    mu_c_i <- fGetmu_c(mu_t_i)
+    lSamples[i,] <- c(mu_t_i, mu_c_i)
+  }
+  
+  return(lSamples)
+}
+
+```
+
+
+# 15.1.9. 
+Use your Gibbs sampler to draw 100 samples. Draw a scatter plot of your (μt, μc) samples with lines connecting consecutive points. Discarding the first 50 observations, how do the estimates of the mean of each parameter compare with their true values?
+
+```{r}
+lGibbsSampleOriginal <- fGibbs(c(10,5), 100)
+lGibbsSampleWarmed <- lGibbsSampleOriginal[51:100,]
+
+```
+
+```{r}
+library(MASS)
+x <- lGibbsSampleOriginal[,1]
+y <- lGibbsSampleOriginal[,2]
+plot(x,y, type = "l" )
+contour(kde2d(x,y), add = T, drawlabels = F, col = "blue" )
+```
+
+```{r}
+library(plotly)
+x <- lGibbsSampleOriginal[,1]
+y <- lGibbsSampleOriginal[,2]
+s <- subplot(
+  plot_ly(x = x, type = "histogram"),
+  plotly_empty(),
+  plot_ly(x = x, y = y, type = "histogram2dcontour"),
+  plot_ly(y = y, type = "histogram"),
+  nrows = 2, heights = c(0.2, 0.8), widths = c(0.8, 0.2), margin = 0,
+  shareX = TRUE, shareY = TRUE, titleX = FALSE, titleY = FALSE
+)
+fig <- layout(s, showlegend = FALSE)
+
+fig
+
+
+
+```
+
+```{r}
+fig <- plot_ly(x = x, y=y) 
+
+fig <- fig %>%
+  add_trace(type='histogram2dcontour')
+
+fig
+
+```
+
+```{r}
+hist(lGibbsSampleOriginal, main = "Mean of mu_c and mu_t")
+```
+
+# 15.1.10 
+Generate 200 samples from each of your Random Walk Metropolis and Gibbs samplers. Discard the first 100 observations of each as warm-up. For each calculate the error in estimating the posterior mean of μt. Repeat this exercise 40 times; each time recording the error. How does their error compare to the independent sampler?
+
+
+```{r}
+set.seed(42)
+numSamples <- 200
+theta_starting <- c(10,5)
+
+lRWMsamples <- RWMetropolis(theta_starting,numSamples)$samples
+lRWMsamplesWarmed <- lRWMsamples[101:200,]
+hist(lRWMsamplesWarmed)
+
+lGibbsSample <- fGibbs(theta_starting, numSamples)
+lGibbsSampleWarmed <- lGibbsSample[101:200,]
+hist(lGibbsSample)
+```
+
+```{r}
+cat("\nmu_t Error:")
+cat("\n   RWM Error: ", mean(lRWMsamplesWarmed[,1]) - 20)
+cat("\n   Gibbs Error:", mean(lGibbsSampleWarmed[,1]) - 20)
+
+cat("\nmu_c Error:")
+cat("\n   RWM Error: ", mean(lRWMsamplesWarmed[,2]) - 5)
+cat("\n   Gibbs Error:", mean(lGibbsSampleWarmed[,2]) - 5)
+
+```
+
+```{r}
+sd(lRWMsamplesWarmed[,1])/sqrt(length(lRWMsamplesWarmed[,1]))
+```
+
+
+
 
