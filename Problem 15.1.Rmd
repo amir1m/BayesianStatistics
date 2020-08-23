@@ -12,6 +12,7 @@ Use your statistical software of choice generate 100 independent samples of (μt
 
 ```{r}
 library (MASS)
+library (mvtnorm)
 Sigma <- matrix(c(2,0.8,0.8,0.5),2,2)
 hist(mvrnorm(n = 100, c(20,5), Sigma), main = "Mean of mu_t and mu_c")
 ```
@@ -39,7 +40,7 @@ fproposal <- function(theta_current){
 Create a function which takes as inputs θcurrent and θproposed, and outputs the ratio of the posteriors of the proposed value to the current one (Hint: to do this in R you will need to use the following to calculate the value of the posterior at (x, y):
 
 ```{r}
-library (mvtnorm)
+
 fGetRatio <- function(theta_current, theta_proposed) {
   r <- dmvnorm(theta_proposed, c(20, 5), sigma = Sigma) / dmvnorm(theta_current ,c(20, 5), sigma = Sigma)
   
@@ -375,35 +376,62 @@ hist(lGibbsSampleOriginal, main = "Mean of mu_c and mu_t")
 Generate 200 samples from each of your Random Walk Metropolis and Gibbs samplers. Discard the first 100 observations of each as warm-up. For each calculate the error in estimating the posterior mean of μt. Repeat this exercise 40 times; each time recording the error. How does their error compare to the independent sampler?
 
 
+
 ```{r}
 set.seed(42)
 numSamples <- 200
+numIterations <- 200
+
+ltrue_mut <- 20
+ltrue_muc <- 5
+
+ltrue_sigma <- matrix(c(2,0.8,0.8,0.5),2,2)
+ltrue_mu <-  c(20,5)
+
 theta_starting <- c(10,5)
 
-lRWMsamples <- RWMetropolis(theta_starting,numSamples)$samples
-lRWMsamplesWarmed <- lRWMsamples[101:200,]
-hist(lRWMsamplesWarmed)
+lerror_rwm <- matrix(nrow = numIterations, ncol = 2)
 
-lGibbsSample <- fGibbs(theta_starting, numSamples)
-lGibbsSampleWarmed <- lGibbsSample[101:200,]
-hist(lGibbsSample)
+lerror_gibbs <- matrix(nrow = numIterations, ncol = 2)
+
+lerror_indept <- matrix(nrow = numIterations, ncol = 2)
+
+for(i in 1:numIterations) {
+  lRWMsamples <- RWMetropolis(theta_starting,numSamples)$samples
+  lRWMsamplesWarmed <- lRWMsamples[101:200,]
+  err_mut <- mean(lRWMsamplesWarmed[, 1]) -  ltrue_mut
+  err_muc <- mean(lRWMsamplesWarmed[, 2]) -  ltrue_muc
+  lerror_rwm[i,] <- c(err_mut, err_muc)
+  
+  lGibbsSample <- fGibbs(theta_starting, numSamples)
+  lGibbsSampleWarmed <- lGibbsSample[101:200,]
+  err_mut <- mean(lGibbsSampleWarmed[, 1]) -  ltrue_mut
+  err_muc <- mean(lGibbsSampleWarmed[, 2]) -  ltrue_muc
+  lerror_gibbs[i,] <- c(err_mut, err_muc)
+  
+  lIndependentSamples <-  mvrnorm(n = 100, mu=ltrue_mu, Sigma = ltrue_sigma)
+  err_mut <- mean(lIndependentSamples[, 1]) -  ltrue_mut
+  err_muc <- mean(lIndependentSamples[, 2]) -  ltrue_muc
+  lerror_indept[i,] <- c(err_mut, err_muc)
+  
+}
+
+```
+
+  
+```{r}
+hist(lerror_rwm[,1], xlim = c(-2,2), col = "orange", main="Figure 15.8:Error mu_t", xlab = "error")
+hist(lerror_gibbs[,1], col = "green", add=T)
+hist(lerror_indept[,1], col = "blue", add=T)
+
 ```
 
 ```{r}
 cat("\nmu_t Error:")
-cat("\n   RWM Error: ", mean(lRWMsamplesWarmed[,1]) - 20)
-cat("\n   Gibbs Error:", mean(lGibbsSampleWarmed[,1]) - 20)
-
-cat("\nmu_c Error:")
-cat("\n   RWM Error: ", mean(lRWMsamplesWarmed[,2]) - 5)
-cat("\n   Gibbs Error:", mean(lGibbsSampleWarmed[,2]) - 5)
+cat("\n   RWM Error: ", mean(lerror_rwm[,1]))
+cat("\n   Gibbs Error:", mean(lerror_gibbs[,1]))
+cat("\n   Independent Error:", mean(lerror_indept[,1]))
 
 ```
-
-```{r}
-sd(lRWMsamplesWarmed[,1])/sqrt(length(lRWMsamplesWarmed[,1]))
-```
-
-
 
 
