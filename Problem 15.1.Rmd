@@ -3,8 +3,7 @@ title: "Problem 15.1"
 output:
   pdf_document:
     latex_engine: xelatex
-  html_document:
-    df_print: paged
+always_allow_html: true
 ---
 
 # 15.1.1
@@ -428,9 +427,9 @@ hist(lerror_indept[,1], col = "blue", add=T)
 
 ```{r}
 cat("\nmu_t Error:")
-cat("\n   RWM Error: ", mean(lerror_rwm[,1]))
-cat("\n   Gibbs Error:", mean(lerror_gibbs[,1]))
-cat("\n   Independent Error:", mean(lerror_indept[,1]))
+cat("\n   RWM Error: ", sd(lerror_rwm[,1]))
+cat("\n   Gibbs Error:", sd(lerror_gibbs[,1]))
+cat("\n   Independent Error:", sd(lerror_indept[,1]))
 
 ```
 
