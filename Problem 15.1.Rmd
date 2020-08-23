@@ -495,15 +495,25 @@ for (numSamples in lMinNumSamples:lMaxNumSamples ){
 
 ```
 
-
+# 15.1.12
+Using the results from the previous question estimate the effective sample size for 150 observations of the Random Walk Metropolis and Gibbs samplers.
 
 ```{r}
-plot(lerror_samples_rwm[,1], col = "orange", type="l")
+
+par(yaxp  = c(0, 3, 40))
+plot(lerror_samples_rwm[,1], col = "orange", type="l", ylim = c(0,3), yaxp=c(0,3,20), xaxp=c(0,200, 50))
 lines(lerror_samples_gibbs[,1], col="green")
 lines(lerror_samples_indep[,1], col="blue")
 
+abline(h=lerror_samples_rwm[,1][150], col= "orange", lty=2)
+abline(v=8, col= "orange", lty=2) #ESS of RWM
+
+abline(h=lerror_samples_gibbs[,1][150], col= "green", lty=2)
+abline(v=60, col= "green", lty=2) #ESS of Gibbs
+
+legend(150, 2.5, legend=c("independent", "RWM", "Gibbs"),
+       col=c("blue", "orange", "green"), lty=1:1, cex=0.8)
 
 ```
-
 
 
