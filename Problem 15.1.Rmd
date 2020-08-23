@@ -117,6 +117,7 @@ RWMetropolis <- function(theta, N) {
 
 # 15.1.2
 ```{r}
+set.seed(42)
 theta_starting <- c(10,5)
 ldebug <- 0
 result <- RWMetropolis(theta_starting,100)
@@ -432,5 +433,77 @@ cat("\n   Gibbs Error:", sd(lerror_gibbs[,1]))
 cat("\n   Independent Error:", sd(lerror_indept[,1]))
 
 ```
+
+#15.1.11. 
+Repeat Problem 15.10 to obtain the average error in estimating the posterior mean of μt across arange of sample sizes n=5 to n=200.
+
+```{r}
+
+set.seed(42)
+#numSamples <- 200
+lMinNumSamples <- 5
+lMaxNumSamples <- 200
+
+numIterations <- 100
+
+ltrue_mut <- 20
+ltrue_muc <- 5
+
+ltrue_sigma <- matrix(c(2,0.8,0.8,0.5),2,2)
+ltrue_mu <-  c(20,5)
+
+theta_starting <- c(10,5)
+
+
+lerror_samples_rwm <- matrix(nrow = lMaxNumSamples - lMinNumSamples+1, ncol = 2 )
+lerror_samples_gibbs <- matrix(nrow = lMaxNumSamples - lMinNumSamples+1, ncol = 2 )
+lerror_samples_indep <- matrix(nrow = lMaxNumSamples - lMinNumSamples+1, ncol = 2 )
+
+ldebug <- 0
+for (numSamples in lMinNumSamples:lMaxNumSamples ){
+  lSampleRange <- seq(from=round(numSamples/2) + 1, to=numSamples)
+  lSampleIndex <- numSamples - lMinNumSamples + 1
+
+  
+  lerror_rwm <- matrix(nrow = numIterations, ncol = 2)
+  lerror_gibbs <- matrix(nrow = numIterations, ncol = 2)
+  lerror_indep <- matrix(nrow = numIterations, ncol = 2)
+
+  for(i in 1:numIterations) {
+    lRWMsamples <- RWMetropolis(theta_starting,numSamples)$samples
+    lRWMsamplesWarmed <- lRWMsamples[lSampleRange,]
+    err_mut <- mean(lRWMsamplesWarmed[, 1]) -  ltrue_mut
+    err_muc <- mean(lRWMsamplesWarmed[, 2]) -  ltrue_muc
+    lerror_rwm[i,] <- c(err_mut, err_muc)
+    
+    lGibbsSample <- fGibbs(theta_starting, numSamples)
+    lGibbsSampleWarmed <- lGibbsSample[lSampleRange,]
+    err_mut <- mean(lGibbsSampleWarmed[, 1]) -  ltrue_mut
+    err_muc <- mean(lGibbsSampleWarmed[, 2]) -  ltrue_muc
+    lerror_gibbs[i,] <- c(err_mut, err_muc)
+    
+    lIndependentSamples <-  mvrnorm(n = round(numSamples/2), mu=ltrue_mu, Sigma = ltrue_sigma)
+    err_mut <- mean(lIndependentSamples[, 1]) -  ltrue_mut
+    err_muc <- mean(lIndependentSamples[, 2]) -  ltrue_muc
+    lerror_indep[i,] <- c(err_mut, err_muc)
+  }
+  
+  lerror_samples_rwm[lSampleIndex,] <- c(sd(lerror_rwm[,1]), sd(lerror_rwm[,2]))
+  lerror_samples_gibbs[lSampleIndex,] <- c(sd(lerror_gibbs[,1]), sd(lerror_gibbs[,2]))
+  lerror_samples_indep[lSampleIndex,] <- c(sd(lerror_indep[,1]), sd(lerror_indep[,2]))
+}
+
+```
+
+
+
+```{r}
+plot(lerror_samples_rwm[,1], col = "orange", type="l")
+lines(lerror_samples_gibbs[,1], col="green")
+lines(lerror_samples_indep[,1], col="blue")
+
+
+```
+
 
 
