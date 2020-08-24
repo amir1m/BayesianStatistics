@@ -207,6 +207,7 @@ cat("\n Rejected % : ", acceptancePerc)
 ```
 
 # 15.1.6
+Using eight chains calculate Rˆ for each of (μt, μc) for a sample size of 100. This time make sure to start your chains in overdispersed positions in parameter space. Use a random number from a multivariate normal centred on the posterior means with a covariance matrix of 40 times the identity matrix
 
 ```{r}
 
@@ -238,6 +239,7 @@ dim(lSamples[[1]])
 ```
 
 # 15.1.7
+After approximately how many iterations does Random Walk Metropolis reach Rˆ < 1.1?
 
 ```{r}
 
@@ -776,13 +778,70 @@ for (numSamples in lMinNumSamples:lMaxNumSamples ){
 
 
 ```{r}
-plot(lerror_samples_rwm[,1], col = "orange", type="l", ylim = c(0,3), yaxp=c(0,3,20), xaxp=c(0,200, 50),  xlab = "sample size", ylab = "mean error")
+plot(lerror_samples_rwm[,1], col = "orange", type="l", ylim = c(0,3),  xaxp=c(0,200, 50), yaxp=c(0,3,20), xlab = "sample size", ylab = "mean error")
 lines(lerror_samples_gibbs[,1], col="green")
 lines(lerror_samples_indep[,1], col="blue")
 lines(lerror_samples_hmc[,1], col="purple")
 
 legend(150, 2.5, legend=c("independent", "RWM", "Gibbs", "HMC"),
        col=c("blue", "orange", "green", "purple"), lty=1:1, cex=0.8)
+
+abline(h=0)
+```
+
+# 15.1.17 
+You receive new data that results in a change in the posterior to: 
+
+Using your Random Walk Metropolis sampler calculate Rˆ for 8 chains; each generating 100 samples for each.
+
+```{r}
+set.seed(42)
+#numSamples <- 100
+acceptancePerc <- vector()
+
+
+mu <- c(20,5)
+sigma <- matrix(c(2,0.99,0.99,0.5),2,2)
+
+
+fRunChain_RWM <- function(numChain, numSamples){
+  for(i in 1:numChain) {
+      theta_starting <- mvrnorm(n=1, mu = mu, Sigma = sigma)
+      lRWMsamplesWarmed <- RWMetropolis(theta_starting,numSamples)$samples[seq(from=round(numSamples/2) + 1, to=numSamples), ]
+      lSamples[[i]] <- lRWMsamplesWarmed
+    }
+  return(fRhat(lSamples))
+}
+
+fRunChain_RWM_SampleRange <- function(lSampleRange){
+  #cat("\nlSampleRange: ", lSampleRange)
+  lRhat <- vector()
+  i <- 1
+  for (numSamples in lSampleRange) {
+    lRhat[i] <- fRunChain_RWM(8, numSamples)
+    i <- i + 1
+  }
+  
+  return(lRhat)
+}
+
+rh <- replicate(4,fRunChain_RWM_SampleRange(seq(5,200)))
+
+
+```
+
+```{r}
+cat("\nRhat : ", dim(rh),"\n")
+
+```
+
+```{r}
+plot(rh[,1], type="l", col=1)
+
+
+for (i in seq(2:4)) {
+  lines(rh[,i], col=i)
+}
 ```
 
 
