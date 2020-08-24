@@ -160,7 +160,8 @@ plot(lSamples_hmc_L20$pos, type = 'l', xlab = "mu_t", ylab = "mu_c", main = "L=2
 
 plot(lSamples_hmc_L50$pos, type = 'l', xlab = "mu_t", ylab = "mu_c", main = "L=50")
 
-plot(lSamples_hmc_L100$pos, type = 'l', xlab = "mu_t", ylab = "mu_c", main = "L=1000")
+plot(lSamples_hmc_L100$pos, type = 'l', xlab = "mu_t", ylab = "mu_c", main = "L=100")
 
 ```
+
 
