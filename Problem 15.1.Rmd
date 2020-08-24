@@ -845,4 +845,7 @@ for (i in seq(2:4)) {
 ```
 
 
+## TODO : Parallelize it!
+
+
 
