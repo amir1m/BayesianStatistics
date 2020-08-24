@@ -119,13 +119,16 @@ HMC_keep <- function (current_q, U, grad_U, epsilon, L, aSigma){
 ```
 
 
-#15.2.1
+
+
+# 15.2.1
 Simulate a single particle starting at (20, 5) for L = 10 steps with the following parameters ε = 0.18 (step size), σ = 0.18 (momentum proposal distribution width). Plot the path in parameter space.
 
 ```{r}
 
 set.seed(42)
-lSamples_hmc <- HMC_keep(current_q = c(20,5),U = U, grad_U = grad_U, epsilon = 0.18, L = 10, aSigma = 0.18)
+lSamples_hmc <- HMC_keep(current_q = c(20,5),U = U, grad_U = grad_U, epsilon = 0.18, 
+                         L = 10, aSigma = 0.18)
 ```
 
 
@@ -140,13 +143,17 @@ Now try L = 20,50,100 steps, again plotting the results what do you notice about
 ```{r}
 set.seed(42)
 
-lSamples_hmc_L10 <- HMC_keep(current_q = c(20,5),U = U, grad_U = grad_U, epsilon = 0.18, L = 10, aSigma = 0.18)
+lSamples_hmc_L10 <- HMC_keep(current_q = c(20,5),U = U, grad_U = grad_U, epsilon = 0.18, 
+                             L = 10, aSigma = 0.18)
 
-lSamples_hmc_L20 <- HMC_keep(current_q = c(20,5),U = U, grad_U = grad_U, epsilon = 0.18, L = 20, aSigma = 0.18)
+lSamples_hmc_L20 <- HMC_keep(current_q = c(20,5),U = U, grad_U = grad_U, epsilon = 0.18, 
+                             L = 20, aSigma = 0.18)
 
-lSamples_hmc_L50 <- HMC_keep(current_q = c(20,5),U = U, grad_U = grad_U, epsilon = 0.18, L = 50, aSigma = 0.18)
+lSamples_hmc_L50 <- HMC_keep(current_q = c(20,5),U = U, grad_U = grad_U, epsilon = 0.18, 
+                             L = 50, aSigma = 0.18)
 
-lSamples_hmc_L100 <- HMC_keep(current_q = c(20,5),U = U, grad_U = grad_U, epsilon = 0.18, L = 100, aSigma = 0.18)
+lSamples_hmc_L100 <- HMC_keep(current_q = c(20,5),U = U, grad_U = grad_U, epsilon = 0.18, 
+                              L = 100, aSigma = 0.18)
 
 ```
 
@@ -172,7 +179,8 @@ Simulate 100 iterations of the particle starting at (20,5), with each particle r
 lSamples_hmc_v <- list()
 
 for(it in seq(1:100)){
-  lSamples_hmc_v[[it]] <- HMC_keep(current_q = c(20,5),U = U, grad_U = grad_U, epsilon = 0.18, L = it, aSigma = 0.18)$pos
+  lSamples_hmc_v[[it]] <- HMC_keep(current_q = c(20,5),U = U, grad_U = grad_U, 
+                                   epsilon = 0.18, L = it, aSigma = 0.18)$pos
 }
 
 
