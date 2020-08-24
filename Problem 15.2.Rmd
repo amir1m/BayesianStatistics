@@ -11,7 +11,7 @@ The code in HMC_UTurn.R uses simulates Hamiltonian dynamics for a single particl
 In this question we will see how the efficiency of HMC depends on choice of the number of in- termediate steps. In particular we investigate the propensity of a particle undergoing Newtonian dynamics to perform U-Turns.
 
 
-# Get the code provided by author of HMC Uturn sampler
+# Get the code provided by author of HMC sampler
 ```{r}
 ## Gradient of the potential with respect to x
 fGradSimpleX <- function(x,y){
@@ -164,4 +164,32 @@ plot(lSamples_hmc_L100$pos, type = 'l', xlab = "mu_t", ylab = "mu_c", main = "L=
 
 ```
 
+# 15.2.3. 
+Simulate 100 iterations of the particle starting at (20,5), with each particle running for L = 100 steps. Examine the motion of the particle in one of the parameter dimensions, and hence determine an optimal number of steps for this distribution.
+
+```{r}
+
+lSamples_hmc_v <- list()
+
+for(it in seq(1:100)){
+  lSamples_hmc_v[[it]] <- HMC_keep(current_q = c(20,5),U = U, grad_U = grad_U, epsilon = 0.18, L = it, aSigma = 0.18)$pos
+}
+
+
+
+```
+
+
+
+```{r}
+
+plot(lSamples_hmc_v[[100]][,1], type="l", col=1, ylim = c(19, 21), xlab = "number of steps", ylab = "mu_t", main="Figure 15.12: The path of 100 particle replicates over in the μt dimension")
+
+for (it in seq(2:100)){
+  lines(lSamples_hmc_v[[it]][,1], col=it)
+}
+
+abline(v=14, col="blue") # After 14 U-turn starts
+
+```
 
