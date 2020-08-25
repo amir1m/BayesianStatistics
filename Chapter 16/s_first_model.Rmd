@@ -1,6 +1,9 @@
 ---
 title: "First Model"
-output: html_notebook
+output:
+  pdf_document:
+    latex_engine: xelatex
+always_allow_html: true
 ---
 
 
