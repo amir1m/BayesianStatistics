@@ -1,0 +1,54 @@
+---
+title: "First Model"
+output: html_notebook
+---
+
+
+```{r}
+N <- 100
+Y <- rnorm(n=N, mean=1.6, sd=0.2)
+hist(Y)
+```
+
+# Compile the model
+```{r}
+library(rstan)
+```
+
+```{r}
+parallel::detectCores()
+```
+
+
+```{r}
+model <- stan_model('first_model.stan')
+```
+
+```{r}
+fit <- sampling(model, list(N=N, Y=Y), iter=200, chain=4)
+```
+
+```{r}
+print(fit)
+```
+
+```{r}
+params <- extract(fit)
+```
+
+```{r}
+hist(params$mu)
+```
+
+```{r}
+hist(params$sigma)
+```
+
+```{r}
+library(shinystan)
+```
+
+```{r}
+launch_shinystan(fit)
+```
+
