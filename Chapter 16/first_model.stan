@@ -32,3 +32,20 @@ model {
   sigma ~ cauchy(0,1);
 }
 
+// PPC
+generated quantities{
+  int aMax_indicator;
+  int aMin_indicator;
+  
+  {
+    vector[N] lSimData;
+  //Generate Posterioe predictive samples
+    for(i in 1:100){
+      lSimData[i] = normal_rng(mu, sigma);
+    }
+    
+    //Compare with real data
+    aMax_indicator = max(lSimData) > max(Y);
+    aMin_indicator = min(lSimData) < min(Y);
+  }
+}

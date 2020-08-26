@@ -18,12 +18,10 @@ hist(Y)
 library(rstan)
 ```
 
-```{r}
-parallel::detectCores()
-```
 
 
 ```{r}
+options(mc.cores = parallel::detectCores())
 model <- stan_model('first_model.stan')
 ```
 
@@ -32,6 +30,7 @@ fit <- sampling(model, list(N=N, Y=Y), iter=200, chain=4)
 ```
 
 ```{r}
+options(max.print=100000)
 print(fit)
 ```
 
@@ -46,6 +45,12 @@ hist(params$mu)
 ```{r}
 hist(params$sigma)
 ```
+```{r}
+library(ggplot2)
+qplot(params$mu)
+```
+
+
 
 ```{r}
 library(shinystan)
