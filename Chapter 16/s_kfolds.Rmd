@@ -16,7 +16,7 @@ options(mc.cores = parallel::detectCores())
 
 ```{r}
 N <- 10000
-X <- rnorm(N, 3, 5)
+X <- rt(N,5)
 ```
 
 
@@ -24,9 +24,6 @@ X <- rnorm(N, 3, 5)
 testIndices <- createFolds(X, k=5, list = TRUE, returnTrain = FALSE)
 ```
 
-```{r}
-testIndices$Fold1
-```
 
 
 ```{r}
@@ -40,7 +37,7 @@ kFold <- function(aModel, testIndices, X){
     XTest <- X[testIndices[[i]]]
     XTrain <- X[-testIndices[[i]]]
 
-    fit <- sampling(aModel, iter=200, chains=4, data=list(NTest=2000, NTrain=8000, XTrain=XTrain, XTest=XTest))
+    fit <- sampling(aModel, iter=200, chains=4, data=list(NTest = 2000, NTrain = 8000, XTrain = XTrain, XTest = XTest))
     
     logLikelihood1 <- extract_log_lik(fit, 'logLikelihood')
     lPointLogLikelihood1 <- colMeans(logLikelihood1)
@@ -52,8 +49,8 @@ kFold <- function(aModel, testIndices, X){
 ```
 
 ```{r}
-#Model1 <- stan_model('Normal_kFolds.stan')
-Model2 <- stan('StudentT_kfold.stan')
+Model1 <- stan_model('Normal_kFolds.stan')
+Model2 <- stan_model('StudentT_kfold.stan')
 ```
 
 
@@ -75,6 +72,9 @@ sum(lELPD2)
 ```
 
 ```{r}
-difference <- sum(lEPD2) - sum(lEPD1)
+difference <- sum(lELPD2) - sum(lELPD1)
+sd <- sqrt(1000)*sd(lELPD1 - lELPD2)
+pvalue <- 1 - pnorm(difference/sd)
+print(pvalue)
 ```
 
