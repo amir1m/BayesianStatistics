@@ -1,0 +1,80 @@
+---
+title: "K Folds"
+output: html_notebook
+---
+
+```{r}
+library(caret)
+library(loo)
+library(rstan)
+```
+
+```{r}
+options(mc.cores = parallel::detectCores())
+```
+
+
+```{r}
+N <- 10000
+X <- rnorm(N, 3, 5)
+```
+
+
+```{r}
+testIndices <- createFolds(X, k=5, list = TRUE, returnTrain = FALSE)
+```
+
+```{r}
+testIndices$Fold1
+```
+
+
+```{r}
+kFold <- function(aModel, testIndices, X){
+  numFolds <- length(testIndices)
+
+  ## Calculate expected log pointwise predictive density
+  lPointLogLikelihoodTotal <- vector()
+
+  for(i in 1:numFolds){
+    XTest <- X[testIndices[[i]]]
+    XTrain <- X[-testIndices[[i]]]
+
+    fit <- sampling(aModel, iter=200, chains=4, data=list(NTest=2000, NTrain=8000, XTrain=XTrain, XTest=XTest))
+    
+    logLikelihood1 <- extract_log_lik(fit, 'logLikelihood')
+    lPointLogLikelihood1 <- colMeans(logLikelihood1)
+    lPointLogLikelihoodTotal <- c(lPointLogLikelihoodTotal, lPointLogLikelihood1)
+  }
+
+  return(lPointLogLikelihoodTotal)
+}
+```
+
+```{r}
+#Model1 <- stan_model('Normal_kFolds.stan')
+Model2 <- stan('StudentT_kfold.stan')
+```
+
+
+```{r}
+print(Model1)
+```
+
+```{r}
+lELPD1 <- kFold(Model1, testIndices, X)
+lELPD2 <- kFold(Model2, testIndices, X)
+```
+
+```{r}
+sum(lELPD1)
+```
+
+```{r}
+sum(lELPD2)
+```
+
+```{r}
+difference <- sum(lEPD2) - sum(lEPD1)
+```
+
