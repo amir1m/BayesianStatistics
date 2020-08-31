@@ -1,0 +1,147 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+setwd("~/Projects/BayesianStatistics/Chapter 16")
+```
+
+#16.1.4 
+Open your statistical software (R, Python, Matlab, and so on) and load any packages necessary to use Stan. (Hint: in R this is done by using library(rstan); in Python this is done using import pystan.)
+
+```{r}
+library(rstan)
+```
+
+```{r}
+options(mc.cores = parallel::detectCores())
+```
+
+#16.1.5 
+Load the data into your software and then put it into a structure that can be passed to Stan. (Hint: in R create a list of the data; in Python create a dictionary where the ‘key’ for each variable is the desired variable name.)
+
+```{r}
+discoveries <- read.csv('evaluation_discoveries.csv')
+plot(discoveries$time,discoveries$discoveries, type='l', xlab = 'Year', ylab = '#discoveries')
+```
+
+
+```{r}
+X <- discoveries$discoveries
+N <- length(Y)
+dataList <- list(N=N, X=X)
+```
+
+#Problem 16.1.6 
+Run your model using Stan, with four chains, each with a sample size of 1000, and a warm-up of 500 samples. Set seed=1 to allow for reproducibility of your results. Store your result in an object called fit.
+
+
+```{r}
+fit <- stan(file='discoveries.stan', data=dataList, iter=1000, chain=4, seed=1)
+```
+
+#16.1.7 
+Diagnose whether your model has converged by printing fit
+
+```{r}
+print(fit)
+```
+
+#16.1.9. 
+Find the central posterior 80% credible interval for λ.
+
+```{r}
+print(fit, pars='lambda', probs = c(0.1, 0.9))
+```
+
+```{r}
+lLambda <- extract(fit, 'lambda')[[1]]
+c(quantile(lLambda, 0.1), quantile(lLambda, 0.9))
+```
+
+#16.1.10 
+Draw a histogram of your posterior samples for λ
+
+```{r}
+params <- extract(fit)
+```
+
+```{r}
+hist(params$lambda)
+```
+
+#16.1.11 
+Load the evaluation_discoveries.csv data and graph it. What does this suggest about our model’s assumptions?
+
+```{r}
+plot(discoveries$time, discoveries$discoveries, type='l')
+hist(discoveries$discoveries)
+```
+
+
+#16.1.12. 
+Create a generated quantities block in your Stan file, and use it to sample from the posterior predictive distribution. Then carry out appropriate posterior predictive checks to evaluate your model. (Hint: use the function poisson_rng to generate independent samples from your lambda).
+
+```{r}
+fit <- stan(file='discoveries.stan', data=dataList, iter=1000, chain=4, seed=1)
+```
+
+
+```{r}
+lXSim <- extract(fit, 'XSim')[[1]]
+lMax <- apply(lXSim, 1, max)
+library(ggplot2)
+qplot(lMax)
+sum(lMax >= 12) / length(lMax)
+```
+
+
+#16.1.13
+A more robust sampling distribution is a negative binomial model:
+            
+            Xi ∼ NB(μ, κ) (16.2)
+            
+where μ is the mean number of discoveries per year, and var(X) = μ + μ2 . Here κ measures the κ degree of over-dispersion of your model; specifically if κ ↑ then over-dispersion↓.
+
+```{r}
+fit_negbin <- stan(file='discoveries_negbin.stan', data=dataList, iter=1000, chain=4, seed=1)
+```
+
+```{r}
+print(fit_negbin)
+```
+
+#16.1.14. 
+Carry out posterior predictive checks on the new model. What do you conclude
+about the use of a negative binomial here versus the simpler Poisson?
+
+```{r}
+fit_negbin <- stan(file='discoveries_negbin.stan', data=dataList, iter=1000, chain=4, seed=1)
+```
+
+```{r}
+lXSim <- extract(fit_negbin, 'XSim')[[1]]
+lMax <- apply(lXSim, 1, max)
+library(ggplot2)
+qplot(lMax)
+sum(lMax >= 12) / length(lMax)
+```
+
+# 16.1.15
+Find the central posterior 80% credible interval for the mean rate of discoveries μ from the negative binomial model. How does it compare with your results from the Poisson model? Why is this the case?
+
+```{r}
+print(fit_negbin, pars='mu', probs = c(0.1, 0.9))
+```
+
+#16.1.16. 
+Calculatetheautocorrelationintheresidualsbetweentheactualandsimulated data series. What do these suggest about our current model?
+
+```{r}
+lXSim <- extract(fit_negbin, 'XSim')[[1]]
+mResid <- sweep(lXSim, 2, X)
+lCorr <- sapply(seq(1, 200, 1), function(i) acf(mResid[i, ], lag.max=1)$acf[[2]])
+qplot(lCorr)
+```
+
