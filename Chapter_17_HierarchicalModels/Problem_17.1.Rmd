@@ -1,0 +1,37 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+setwd("~/Projects/BayesianStatistics/Chapter_17_HierarchicalModels")
+```
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+library(rstan)
+options(mc.cores = parallel::detectCores())
+```
+
+# 17.1.1
+
+```{r}
+study <- read.csv('hierarchical_betaBlocker.csv')
+study
+```
+
+```{r}
+dataList <- list(N=22, rt=study$rt, nt=study$nt, rc=study$rc, nc=study$nc, N=study$N)
+```
+
+```{r}
+fit <- stan(file = 'BetaBlocker.stan', data=dataList, iter=1000, chain=4, seed=1)
+```
+
+```{r}
+print(fit)
+```
+
