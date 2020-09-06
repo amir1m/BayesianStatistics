@@ -8,10 +8,6 @@ setwd("~/Projects/BayesianStatistics/Chapter_17_HierarchicalModels")
 ```
 
 ```{r}
-library(ggplot2)
-```
-
-```{r}
 library(rstan)
 options(mc.cores = parallel::detectCores())
 ```
@@ -34,4 +30,30 @@ fit <- stan(file = 'BetaBlocker.stan', data=dataList, iter=1000, chain=4, seed=1
 ```{r}
 print(fit)
 ```
+
+#17.1.2. 
+An alternative framework is a hierarchical model where we assume there to be a common over-arching distribution, across trials such that δi ∼ N (d, σ). By assuming the following priors on these parameters estimate this model:
+d ∼ N (0, 10) (17.9)
+σ ∼ Cauchy(0, 2.5), for σ ≥ 0 (17.10) 
+
+Estimate the posteriors for δi using Stan. How do these estimates compare to the non-hierarchical model?
+
+```{r}
+fit_hier <- stan(file = 'BetaBlockerHierarchical.stan', data=dataList, iter=1000, chain=4, seed=1,control = list(adapt_delta = 0.95))
+```
+```{r}
+print(fit_hier)
+```
+
+# 17.1.3. 
+Using the hierarchical model estimate the cross-study effect of the beta-blockers. (Hint: use the generated quantities code block.)
+```{r}
+params_hier <- extract(fit_hier)
+```
+
+```{r}
+hist(params_hier$delta_new)
+abline(v=0, col="blue")
+```
+
 
