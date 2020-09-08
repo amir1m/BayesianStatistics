@@ -1,0 +1,102 @@
+---
+title: "18.1 Crime and punishment"
+output: html_notebook
+---
+
+
+The data in linearRegression_crimePunishment.csv contains the murder rate per capita and the rate of automobile crimes per 100,000 individuals (both on the log scale) in the ten US States that have changed their legislation on capital punishment since 1960 (in all cases the states abolished capital punishment). We also include a dummy variable (“law”) that is 1 if the state allows capital punishment in that year, and 0 otherwise. The crime data is from http://www.disastercenter.com.
+
+# Problem 18.1.1. Graph the data and comment on any trends.
+
+```{r}
+crime_data <- read.csv('linearRegression_crimePunishment.csv')
+crime_data
+```
+
+```{r}
+library(tidyverse)
+
+```
+
+```{r}
+ggplot(data=crime_data) + geom_point(mapping=aes(x=year, y=murder))
+
+ggplot(data=crime_data) + geom_line(mapping=aes(x=year, y=murder))
+
+```
+
+```{r}
+ggplot(data=crime_data) + geom_smooth(mapping=aes(x=year, y=murder,linetype=stateName))
+
+ggplot(data=crime_data) + geom_smooth(mapping=aes(x=year, y=murder,group=stateName))
+
+ggplot(data=crime_data) + geom_smooth(mapping=aes(x=year, y=murder, color=stateName))
+
+```
+
+```{r}
+#ggplot(data=filter(crime_data, stateName=='Connecticut')) + geom_line(mapping=aes(x=year, y=murder)) + geom_line(mapping=aes(x=year, y=car))
+
+ggplot(data=filter(crime_data, stateName=='Connecticut'), aes(year)) + geom_line(aes(y=murder, color="murder")) + geom_line(aes(y=car/2, color="car")) + geom_line(aes(y=law, color='law'))
+
+```
+
+```{r}
+filter(crime_data, stateName=='Connecticut')
+```
+
+
+```{r}
+df <- filter(crime_data, stateName=='Connecticut') %>%
+  select(year, murder, car, law) %>%
+  gather(key="variable", value = "value", -year)
+
+ggplot(df, aes(x=year, y=value)) +
+  geom_line(aes(color=variable, linetype=variable)) + ggtitle("Connecticut") + theme(plot.title = element_text(hjust = 0.5)) 
+
+
+```
+
+```{r}
+
+
+for (lstate in unique(crime_data$stateName)){
+  df <- filter(crime_data, crime_data$stateName == lstate) %>%
+  select(year, murder, car, law) %>%
+  gather(key="variable", value = "value", -year)
+  
+  print(ggplot(df, aes(x=year, y=value)) +
+  geom_line(aes(color=variable, linetype=variable)) +  ggtitle(lstate) + theme(plot.title = element_text(hjust = 0.5)))
+  
+}
+
+```
+
+# Problem 18.1.2. 
+A simple model for murder rates is of the form,
+
+            murderi,t ∼ N (α + βpenaltyi,t + γcari,t, σ) (18.1)
+
+where we assume that the effect of having the death penalty is given by β, which is assumed to be the same across all states. We include cari,t – a measure of crimes on automobiles, as an independent variable to proxy for the contemporaneous underlying level of crime. Estimate this model and hence determine whether the death penalty acts as a deterrent to murder.
+
+```{r}
+library(rstan)
+options(mc.cores = parallel::detectCores())
+```
+
+
+```{r}
+dataList <- list(N = 540, murder = crime_data$murder, car = crime_data$car,
+                 law = crime_data$law, state = crime_data$state)
+```
+
+
+```{r}
+fit <- stan(file = 'Model_Problem_18_1.stan', data = dataList, iter=1000, chains=4, seed=42)
+
+```
+
+```{r}
+print(fit)
+```
+
