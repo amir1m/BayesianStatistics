@@ -119,3 +119,125 @@ Again estimate this model and compare the effect size of the death penalty acros
 fit_time_trends <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1000, chains=4, seed=42)
 ```
 
+```{r}
+print(fit_time_trends)
+```
+## Fixing divergent iterations
+Let's try by increasing control = list(adapt_delta = 0.9)
+
+```{r}
+fit_time_trends_2 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1000, chains=4, control = list(adapt_delta = 0.9), seed=42)
+```
+```{r}
+print(fit_time_trends_2)
+```
+Lets try now further increasing step size from 0.9 to 0.95
+
+```{r}
+fit_time_trends_3 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1000, chains=4, control = list(adapt_delta = 0.95), seed=42)
+```
+
+Still 5 divergent transitions after warmup.Lets increase iterations as well?
+
+```{r}
+fit_time_trends_4 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=2000, chains=4, control = list(adapt_delta = 0.95), seed=42)
+```
+Increasing no. of iteration didn't help! Incresed the divergent iterations to 23 from 5!
+
+Lets go back to 1000 iterations
+
+```{r}
+fit_time_trends_5 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1000, chains=4, control = list(adapt_delta = 0.95), seed=42)
+```
+
+```{r}
+print(fit_time_trends_5)
+```
+
+### Lets diagnose more by following https://betanalpha.github.io/assets/case_studies/rstan_workflow.html
+
+Get https://raw.githubusercontent.com/betanalpha/knitr_case_studies/master/qr_regression/stan_utility.R
+
+```{r}
+source('stan_utility.R')
+lsf.str()
+```
+
+
+```{r}
+check_n_eff(fit_time_trends_5)
+```
+
+```{r}
+check_rhat(fit_time_trends_5)
+```
+
+```{r}
+check_treedepth(fit_time_trends_5)
+```
+
+```{r}
+check_div(fit_time_trends_5)
+```
+
+Let's increase adapt delta to 0.98
+```{r}
+fit_time_trends_6 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1000, chains=4, control = list(adapt_delta = 0.98), seed=42)
+```
+### Fixing Maximum Treedepth
+
+```{r}
+check_treedepth(fit_time_trends_6)
+```
+
+Lets try using tredepth to 15 as : control=list(max_treedepth=15)
+
+```{r}
+fit_time_trends_6 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1000, chains=4, control = list(adapt_delta = 0.98, max_treedepth=15), seed=42)
+```
+```{r}
+fit_time_trends_7 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1000, chains=4, control = list(adapt_delta = 0.99, max_treedepth=15), seed=42)
+```
+
+```{r}
+fit_time_trends_7 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1000, chains=4, control = list(adapt_delta = 0.995, max_treedepth=15), seed=42)
+```
+
+
+```{r}
+fit_time_trends_8 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1000, chains=4, control = list(adapt_delta = 0.995), seed=42)
+```
+
+```{r}
+fit_time_trends_9 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1000, chains=4, control = list(adapt_delta = 0.995,max_treedepth=13), seed=42)
+```
+
+```{r}
+fit_time_trends_10 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1000, chains=4, control = list(adapt_delta = 0.995,max_treedepth=20), seed=42)
+```
+
+```{r}
+ fit_time_trends_10 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1000, chains=4, control = list(adapt_delta = 0.998,max_treedepth=20), seed=42)
+```
+
+```{r}
+fit_time_trends_11 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1000, chains=4, control = list(adapt_delta = 0.998), seed=42)
+```
+
+```{r}
+fit_time_trends_11 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1000, chains=4, control = list(adapt_delta = 0.998,max_treedepth=15 ), seed=42)
+```
+
+
+```{r}
+fit_time_trends_12 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=2000, chains=4, control = list(adapt_delta = 0.998,max_treedepth=15 ), seed=42)
+```
+
+```{r}
+fit_time_trends_12 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1500, chains=4, control = list(adapt_delta = 0.998,max_treedepth=15 ), seed=42)
+```
+
+```{r}
+fit_time_trends_12 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=3000, chains=4, control = list(adapt_delta = 0.998,max_treedepth=15 ), seed=42)
+```
+
