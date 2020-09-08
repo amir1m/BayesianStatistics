@@ -108,3 +108,14 @@ fit_hetrogenous <- stan(file = 'Model_Hetrogeneous_Prob_18_1.stan', data = dataL
 print(fit_hetrogenous)
 ```
 With a mean effect size of a 26% reduction in murder rates although with a much wider range of effects.
+
+# Problem extra. (Not in main text but wanted to include) 
+Another model allows there to be time trends in the data,
+    murderi,t ∼ N (αi + δit + βipenaltyi,t + γicari,t, σi) , (18.3) where δi ∼ N(δ ̄,σδ). 
+
+Again estimate this model and compare the effect size of the death penalty across the three models.
+
+```{r}
+fit_time_trends <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1000, chains=4, seed=42)
+```
+
