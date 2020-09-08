@@ -6,7 +6,8 @@ output: html_notebook
 
 The data in linearRegression_crimePunishment.csv contains the murder rate per capita and the rate of automobile crimes per 100,000 individuals (both on the log scale) in the ten US States that have changed their legislation on capital punishment since 1960 (in all cases the states abolished capital punishment). We also include a dummy variable (“law”) that is 1 if the state allows capital punishment in that year, and 0 otherwise. The crime data is from http://www.disastercenter.com.
 
-# Problem 18.1.1. Graph the data and comment on any trends.
+# Problem 18.1.1. 
+Graph the data and comment on any trends.
 
 ```{r}
 crime_data <- read.csv('linearRegression_crimePunishment.csv')
@@ -18,32 +19,13 @@ library(tidyverse)
 
 ```
 
-```{r}
-ggplot(data=crime_data) + geom_point(mapping=aes(x=year, y=murder))
 
-ggplot(data=crime_data) + geom_line(mapping=aes(x=year, y=murder))
-
-```
 
 ```{r}
-ggplot(data=crime_data) + geom_smooth(mapping=aes(x=year, y=murder,linetype=stateName))
-
-ggplot(data=crime_data) + geom_smooth(mapping=aes(x=year, y=murder,group=stateName))
-
-ggplot(data=crime_data) + geom_smooth(mapping=aes(x=year, y=murder, color=stateName))
-
-```
-
-```{r}
-#ggplot(data=filter(crime_data, stateName=='Connecticut')) + geom_line(mapping=aes(x=year, y=murder)) + geom_line(mapping=aes(x=year, y=car))
-
 ggplot(data=filter(crime_data, stateName=='Connecticut'), aes(year)) + geom_line(aes(y=murder, color="murder")) + geom_line(aes(y=car/2, color="car")) + geom_line(aes(y=law, color='law'))
 
 ```
 
-```{r}
-filter(crime_data, stateName=='Connecticut')
-```
 
 
 ```{r}
@@ -99,4 +81,30 @@ fit <- stan(file = 'Model_Problem_18_1.stan', data = dataList, iter=1000, chains
 ```{r}
 print(fit)
 ```
+_Where we see that we estimate that the imposition of the death penalty on average raises the murder rate by on average 24%!_
 
+# Problem 18.1.3. 
+An alternative model allows there to be state-level effects,
+
+        murderi,t ∼ N (αi + βipenaltyi,t + γicari,t, σi) , (18.2)
+
+where we assume that αi ∼ N(α ̄,σα), βi ∼ N(β ̄,σβ) and γi ∼ N(γ ̄,σγ) (we assume fully heteroge- neous estimates for σ). Estimate the above model and compare the results with the homogeneous
+coefficient model.
+```{r}
+K = length(unique(crime_data$stateName))
+K
+```
+
+
+```{r}
+dataList <- list(N = 540, K = length(unique(crime_data$stateName)), murder = crime_data$murder, car = crime_data$car, law = crime_data$law, state = crime_data$state)
+```
+
+```{r}
+fit_hetrogenous <- stan(file = 'Model_Hetrogeneous_Prob_18_1.stan', data = dataList, iter=1000, chains=4, seed=42)
+```
+
+```{r}
+print(fit_hetrogenous)
+```
+With a mean effect size of a 26% reduction in murder rates although with a much wider range of effects.
