@@ -357,6 +357,7 @@ beta_fit_time <- extract(fit_time, 'beta')[[1]]
 qplot(beta_fit_time)
 ```
 
+### Credible interval for time model
 ```{r}
 quantile(extract(fit_time, pars = "beta_average")[[1]], probs = c(0.0, 0.5))
 ```
