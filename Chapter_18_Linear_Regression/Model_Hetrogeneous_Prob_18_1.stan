@@ -65,8 +65,12 @@ generated quantities{
   gamma_average = normal_rng(gamma_top, gamma_sigma);
   
   for(i in 1:N)
-    logLikelihood[i] = normal_lpdf(murder[i] | alpha_average + beta_average * law[i] + gamma_average * car[i], sigma);
+    logLikelihood[i] = normal_lpdf(murder[i] | alpha[state[i]] + beta[state[i]] * law[i]
+                       + gamma[state[i]] * car[i], sigma[state[i]]);
 }
+
+
+
 
 
 

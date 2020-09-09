@@ -275,3 +275,27 @@ fit_time <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter
 print(fit_time)
 ```
 
+
+```{r}
+library(loo)
+```
+
+```{r}
+lLoglikelihood_fit_homog <- extract_log_lik(fit_homog, 'logLikelihood')
+aWAIC_fit_homog <- waic(lLoglikelihood_fit_homog)
+aWAIC_fit_homog
+
+```
+
+```{r}
+lLoglikelihood_fit_hetrog <- extract_log_lik(fit_hetrog, 'logLikelihood')
+aWAIC_fit_hetrog <- waic(lLoglikelihood_fit_hetrog)
+aWAIC_fit_hetrog
+```
+
+```{r}
+lLoglikelihood_fit_time <- extract_log_lik(fit_time, 'logLikelihood')
+aWAIC_fit_time <- waic(lLoglikelihood_fit_time)
+aWAIC_fit_time
+```
+
