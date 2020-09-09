@@ -299,3 +299,65 @@ aWAIC_fit_time <- waic(lLoglikelihood_fit_time)
 aWAIC_fit_time
 ```
 
+
+
+```{r}
+lLoglikelihood_fit_homog_1 = extract_log_lik(fit_homog,'logLikelihood', merge_chains = F)
+lLoglikelihood_fit_hetrog_1 = extract_log_lik(fit_hetrog,'logLikelihood', merge_chains = F)
+lLoglikelihood_fit_time_1 = extract_log_lik(fit_time,'logLikelihood', merge_chains = F)
+
+```
+
+```{r}
+r_eff_fit_homog_1=relative_eff(lLoglikelihood_fit_homog_1)
+r_eff_fit_hetrog_1=relative_eff(lLoglikelihood_fit_hetrog_1)
+r_eff_fit_time_1=relative_eff(lLoglikelihood_fit_time_1)
+```
+
+```{r}
+loo_fit_homog_1 <- loo(lLoglikelihood_fit_homog_1, r_eff=r_eff_fit_homog_1)
+loo_fit_hetrog_1 <- loo(lLoglikelihood_fit_hetrog_1, r_eff=r_eff_fit_hetrog_1)
+loo_fit_time_1 <- loo(lLoglikelihood_fit_time_1, r_eff=r_eff_fit_time_1)
+
+```
+
+```{r}
+loo_fit_time_1 <- loo(lLoglikelihood_fit_time_1, r_eff=r_eff_fit_time_1)
+
+```
+
+```{r}
+loo_fit_time_1
+```
+
+
+```{r}
+loo_fit_homog_1
+```
+
+```{r}
+loo_fit_hetrog_1
+```
+
+
+
+```{r}
+loo_compare(loo_fit_homog_1,loo_fit_hetrog_1,loo_fit_time_1)
+```
+
+```{r}
+stan_dens(fit_time, pars = c('beta_average'))
+```
+
+```{r}
+beta_fit_time <- extract(fit_time, 'beta')[[1]]
+```
+
+```{r}
+qplot(beta_fit_time)
+```
+
+```{r}
+quantile(extract(fit_time, pars = "beta_average")[[1]], probs = c(0.0, 0.5))
+```
+
