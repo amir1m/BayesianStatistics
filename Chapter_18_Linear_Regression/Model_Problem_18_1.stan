@@ -41,4 +41,11 @@ model{
   sigma ~ normal(0, 1);
 }
 
+generated quantities{
+  real logLikelihood[N];
+  for(i in 1:N)
+    logLikelihood[i] = normal_lpdf(murder[i] | alpha + beta * law[i] + gamma * car[i], sigma);
+}
+
+
 

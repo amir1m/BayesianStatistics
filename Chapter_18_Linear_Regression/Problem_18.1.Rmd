@@ -238,6 +238,40 @@ fit_time_trends_12 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = data
 ```
 
 ```{r}
-fit_time_trends_12 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=3000, chains=4, control = list(adapt_delta = 0.998,max_treedepth=15 ), seed=42)
+fit_time_trends_13 <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=3000, chains=4, control = list(adapt_delta = 0.998,max_treedepth=15 ), seed=42)
+```
+
+Lets seect 10 or 11 as there is no message about ESS being too low and we have less divergent transitions.
+```{r}
+print(fit_time_trends_10)
+```
+
+
+#Problem 18.1.4. 
+Compare the predictive fit of the models using the estimated leave-one-out cross-validation from the “loo” package. Which of the three models do you prefer? Hence conclude as to whether the death penalty acts as a deterrent of murder.
+
+```{r}
+fit_homog <- stan(file = 'Model_Problem_18_1.stan', data = dataList, iter=1000, chains=4, seed=42)
+```
+```{r}
+print(fit_homog)
+```
+
+
+```{r}
+fit_hetrog <- stan(file = 'Model_Hetrogeneous_Prob_18_1.stan', data = dataList, iter=1000, chains=4, seed=42)
+```
+```{r}
+print(fit_hetrog)
+```
+
+
+```{r}
+fit_time <- stan(file = 'Model_timeTrends_Prob_18_1.stan', data = dataList, iter=1000, chains=4, control = list(adapt_delta = 0.998,max_treedepth=20), seed=42)
+```
+
+
+```{r}
+print(fit_time)
 ```
 
